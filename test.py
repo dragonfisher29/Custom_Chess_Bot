@@ -5,7 +5,7 @@ from chessmaker.chess.base import Board
 from extension.board_utils import print_board_ascii, copy_piece_move
 from extension.board_rules import get_result
 from samples import white, black, sample0, sample1
-from agent import agent
+from agent1 import agent
 from opponent import opponent
 
 def make_custom_board(board_sample):
@@ -23,6 +23,7 @@ def testgame(p_white, p_black, board_sample):
     board, players = make_custom_board(board_sample)
     turn_order = cycle(players)
     var = None
+    moves_log = []
     print("=== Initial position ===")
     print_board_ascii(board)
     while True:
@@ -47,11 +48,14 @@ def testgame(p_white, p_black, board_sample):
             else:
                 try:
                     piece.move(move_opt)
-                    print(f"{piece} move to: ({move_opt.position.x},{move_opt.position.y})")
+                    move_str = f"{player.name}: {piece} → ({move_opt.position.x}, {move_opt.position.y})"
                     if getattr(move_opt, "captures", None):
                         caps = ", ".join(f"({c.x},{c.y})" for c in move_opt.captures)
                         if caps:
-                            print(f"{piece} captures at: {caps}")
+                            move_str += f" captures at {caps}"
+                    moves_log.append(move_str)  # <-- NEW: record move
+                    print(move_str)
+
                 except Exception:
                     print(f"=== Game ended: {player.name} can not make a legal move ===")
                     break
@@ -65,6 +69,10 @@ def testgame(p_white, p_black, board_sample):
         except KeyboardInterrupt:
             print(f"=== Game ended by keyboard interuption ===")
             sys.exit()
+
+    print("\n=== Full Move History ===")
+    for i, move in enumerate(moves_log, 1):
+        print(f"{i:02d}. {move}")
 
 if __name__ == "__main__":
     testgame(p_white=agent, p_black=opponent, board_sample=sample0)
